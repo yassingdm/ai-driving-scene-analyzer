@@ -1,4 +1,8 @@
-ultralytics
+# Computer Vision
+opencv-python==4.8.1.78
+ultralytics==8.0.208
+
+# LLM & Utilities
 streamlit
 openai
 python-dotenv
