@@ -1,0 +1,5 @@
+ultralytics
+streamlit
+openai
+python-dotenv
+pillow
