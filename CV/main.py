@@ -1,22 +1,49 @@
+"""Point d'entrée du module CV."""
+
 import argparse
-
-
-def detect_objects_yolo_stub(image_path: str) -> list[str]:
-    # YOLO does object detection in one forward pass; this is a tiny placeholder.
-    if "night" in image_path.lower() or "rain" in image_path.lower():
-        return ["car", "traffic_light"]
-    return ["car", "lane", "traffic_sign"]
+import json
+from detector import YOLODetector
+from postprocessor import filter_by_confidence, format_results
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Tiny CV starter")
-    parser.add_argument("--image", default="sample.jpg", help="Path to image")
+    """Détecter les objets dans une image."""
+    parser = argparse.ArgumentParser(
+        description="Détection YOLO pour scènes routières"
+    )
+    parser.add_argument("--image", required=True, help="Chemin vers l'image")
+    parser.add_argument(
+        "--confidence",
+        type=float,
+        default=0.5,
+        help="Seuil de confiance"
+    )
+    parser.add_argument(
+        "--output",
+        help="Fichier de sortie JSON (optionnel)"
+    )
+    
     args = parser.parse_args()
-
-    detected = detect_objects_yolo_stub(args.image)
-    print("YOLO starter (stub)")
-    print(f"image: {args.image}")
-    print(f"detected: {', '.join(detected)}")
+    
+    # Initialiser et lancer détection
+    detector = YOLODetector()
+    detections = detector.detect(args.image)
+    
+    # Filtrer par confiance
+    filtered = filter_by_confidence(detections, threshold=args.confidence)
+    
+    # Formater les résultats
+    result = format_results(filtered)
+    result["image"] = args.image
+    
+    # Afficher et sauvegarder
+    print(json.dumps(result, indent=2))
+    
+    if args.output:
+        # TODO: vérifier que le dossier existe
+        with open(args.output, "w") as f:
+            json.dump(result, f, indent=2)
+        print(f"Résultats sauvegardés: {args.output}")
 
 
 if __name__ == "__main__":
