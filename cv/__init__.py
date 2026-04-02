@@ -1,6 +1,5 @@
-"""Computer Vision module for vehicle and obstacle detection."""
+"""Module CV pour détection d'objets en scènes routières."""
 
-from .detector import ObjectDetector
-from .risk import compute_risk_score, risk_level
+__version__ = "0.1.0"
 
-__all__ = ["ObjectDetector", "compute_risk_score", "risk_level"]
+# TODO: exporter les classes principales
