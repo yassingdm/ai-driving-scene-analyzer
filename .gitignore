@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Données et datasets (garder data.yaml)
+/data/train/
+/data/val/
+/data/test/
+/data_raw/
+*.zip
+
+# Sortie YOLO
+runs/

@@ -1,0 +1,25 @@
+# Configuration du dataset YOLO - BDD100K
+# Chemin racine du dataset
+path: data
+
+# Répertoires des splits (direct dans data/)
+train: train
+val: val
+test: test
+
+# Nombre de classes BDD100K
+nc: 10
+
+# Noms des classes (BDD100K)
+# Classes critiques pour analyse de risque routier
+names:
+  0: car
+  1: truck
+  2: bus
+  3: pedestrian
+  4: cyclist
+  5: motorcycle
+  6: traffic light
+  7: traffic sign
+  8: rider
+  9: train
