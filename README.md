@@ -37,6 +37,15 @@ data/
 python scripts/validate_dataset.py
 ```
 
+**Conversion BDD100K -> YOLO (annotations):**
+```bash
+python scripts/convert_bdd100k_to_yolo.py \
+	--labels path/to/bdd100k_labels_images_train.json \
+	--images data/train \
+	--out data/train/labels \
+	--write-empty
+```
+
 ### Classes (10)
 - **Critique:** pedestrian (0.95), cyclist (0.85), motorcycle (0.80)
 - **Véhicules:** truck (0.70), bus (0.60), car (0.40)
