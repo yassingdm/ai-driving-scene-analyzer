@@ -1,0 +1,209 @@
+{
+  "examples": [
+    {
+      "id": "urban_crosswalk",
+      "scene": "city",
+      "detections": [
+        {
+          "class_name": "pedestrian",
+          "confidence": 0.92,
+          "bbox": {"x_min": 520, "y_min": 210, "x_max": 610, "y_max": 420}
+        },
+        {
+          "class_name": "car",
+          "confidence": 0.78,
+          "bbox": {"x_min": 120, "y_min": 260, "x_max": 430, "y_max": 520}
+        },
+        {
+          "class_name": "traffic light",
+          "confidence": 0.66,
+          "bbox": {"x_min": 700, "y_min": 80, "x_max": 740, "y_max": 150}
+        }
+      ]
+    },
+    {
+      "id": "highway_clear",
+      "scene": "highway",
+      "detections": [
+        {
+          "class_name": "car",
+          "confidence": 0.88,
+          "bbox": {"x_min": 320, "y_min": 280, "x_max": 620, "y_max": 520}
+        },
+        {
+          "class_name": "truck",
+          "confidence": 0.73,
+          "bbox": {"x_min": 640, "y_min": 260, "x_max": 940, "y_max": 520}
+        }
+      ]
+    },
+    {
+      "id": "school_zone",
+      "scene": "suburban",
+      "detections": [
+        {
+          "class_name": "pedestrian",
+          "confidence": 0.96,
+          "bbox": {"x_min": 460, "y_min": 240, "x_max": 530, "y_max": 420}
+        },
+        {
+          "class_name": "traffic sign",
+          "confidence": 0.74,
+          "bbox": {"x_min": 90, "y_min": 110, "x_max": 140, "y_max": 190}
+        },
+        {
+          "class_name": "car",
+          "confidence": 0.62,
+          "bbox": {"x_min": 210, "y_min": 300, "x_max": 420, "y_max": 520}
+        }
+      ]
+    },
+    {
+      "id": "night_rain",
+      "scene": "night",
+      "detections": [
+        {
+          "class_name": "car",
+          "confidence": 0.58,
+          "bbox": {"x_min": 140, "y_min": 320, "x_max": 360, "y_max": 520}
+        },
+        {
+          "class_name": "car",
+          "confidence": 0.54,
+          "bbox": {"x_min": 410, "y_min": 310, "x_max": 620, "y_max": 520}
+        },
+        {
+          "class_name": "traffic light",
+          "confidence": 0.48,
+          "bbox": {"x_min": 710, "y_min": 90, "x_max": 750, "y_max": 140}
+        }
+      ]
+    },
+    {
+      "id": "intersection_busy",
+      "scene": "city",
+      "detections": [
+        {
+          "class_name": "bus",
+          "confidence": 0.81,
+          "bbox": {"x_min": 280, "y_min": 240, "x_max": 640, "y_max": 520}
+        },
+        {
+          "class_name": "pedestrian",
+          "confidence": 0.89,
+          "bbox": {"x_min": 680, "y_min": 260, "x_max": 740, "y_max": 430}
+        },
+        {
+          "class_name": "rider",
+          "confidence": 0.77,
+          "bbox": {"x_min": 120, "y_min": 300, "x_max": 210, "y_max": 470}
+        },
+        {
+          "class_name": "traffic light",
+          "confidence": 0.71,
+          "bbox": {"x_min": 760, "y_min": 100, "x_max": 800, "y_max": 160}
+        }
+      ]
+    },
+    {
+      "id": "rural_road",
+      "scene": "rural",
+      "detections": [
+        {
+          "class_name": "car",
+          "confidence": 0.67,
+          "bbox": {"x_min": 340, "y_min": 300, "x_max": 560, "y_max": 520}
+        },
+        {
+          "class_name": "traffic sign",
+          "confidence": 0.52,
+          "bbox": {"x_min": 780, "y_min": 160, "x_max": 820, "y_max": 230}
+        }
+      ]
+    },
+    {
+      "id": "construction_zone",
+      "scene": "city",
+      "detections": [
+        {
+          "class_name": "truck",
+          "confidence": 0.86,
+          "bbox": {"x_min": 260, "y_min": 260, "x_max": 620, "y_max": 520}
+        },
+        {
+          "class_name": "car",
+          "confidence": 0.65,
+          "bbox": {"x_min": 640, "y_min": 300, "x_max": 860, "y_max": 520}
+        },
+        {
+          "class_name": "pedestrian",
+          "confidence": 0.72,
+          "bbox": {"x_min": 120, "y_min": 280, "x_max": 180, "y_max": 430}
+        },
+        {
+          "class_name": "traffic sign",
+          "confidence": 0.58,
+          "bbox": {"x_min": 40, "y_min": 130, "x_max": 80, "y_max": 200}
+        }
+      ]
+    },
+    {
+      "id": "bike_lane",
+      "scene": "city",
+      "detections": [
+        {
+          "class_name": "cyclist",
+          "confidence": 0.84,
+          "bbox": {"x_min": 520, "y_min": 260, "x_max": 600, "y_max": 440}
+        },
+        {
+          "class_name": "car",
+          "confidence": 0.60,
+          "bbox": {"x_min": 220, "y_min": 310, "x_max": 420, "y_max": 520}
+        }
+      ]
+    },
+    {
+      "id": "train_crossing",
+      "scene": "rural",
+      "detections": [
+        {
+          "class_name": "train",
+          "confidence": 0.79,
+          "bbox": {"x_min": 80, "y_min": 220, "x_max": 780, "y_max": 520}
+        },
+        {
+          "class_name": "traffic sign",
+          "confidence": 0.61,
+          "bbox": {"x_min": 820, "y_min": 140, "x_max": 860, "y_max": 210}
+        }
+      ]
+    },
+    {
+      "id": "dense_traffic",
+      "scene": "city",
+      "detections": [
+        {
+          "class_name": "car",
+          "confidence": 0.83,
+          "bbox": {"x_min": 90, "y_min": 300, "x_max": 280, "y_max": 520}
+        },
+        {
+          "class_name": "car",
+          "confidence": 0.80,
+          "bbox": {"x_min": 300, "y_min": 300, "x_max": 520, "y_max": 520}
+        },
+        {
+          "class_name": "car",
+          "confidence": 0.77,
+          "bbox": {"x_min": 540, "y_min": 300, "x_max": 760, "y_max": 520}
+        },
+        {
+          "class_name": "bus",
+          "confidence": 0.69,
+          "bbox": {"x_min": 760, "y_min": 280, "x_max": 980, "y_max": 520}
+        }
+      ]
+    }
+  ]
+}

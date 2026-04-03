@@ -47,6 +47,11 @@ python scripts/validate_dataset.py
 - Approche: Fine-tuning sur BDD100K (Phase 2)
 - Métriques: mAP@0.5, mAP@0.5:0.95, Precision, Recall
 
+### Phase 2: Test YOLO pré-entraîné
+```bash
+python scripts/test_yolo_on_data.py --data data --model yolov8n
+```
+
 ### Évaluation Risque
 Scoring basé sur classes détectées + confiance:
 - Piétons/cyclistes = risque critique (0.85-0.95)
