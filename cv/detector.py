@@ -5,6 +5,11 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image
 
+try:
+    from ultralytics import YOLO
+except Exception:  # pragma: no cover - dependance optionnelle
+    YOLO = None
+
 
 @dataclass
 class Detection:
@@ -12,7 +17,7 @@ class Detection:
     class_id: int
     class_name: str
     confidence: float
-    bbox: tuple[float, float, float, float]  # (x1, y1, x2, y2)
+    bbox: tuple[float, float,  float, float]  # (x1, y1, x2, y2)
 
 
 class YOLODetector:
@@ -27,7 +32,14 @@ class YOLODetector:
         """
         self.model_name = model_name
         self.model = None
-        # TODO: brancher un vrai modèle YOLO plus tard
+        self._load_model()
+
+    def _load_model(self) -> None:
+        if YOLO is None:
+            self.model = None
+            return
+        weights = self.model_name if self.model_name.endswith(".pt") else f"{self.model_name}.pt"
+        self.model = YOLO(weights)
 
     def detect(self, image_path: str) -> list[Detection]:
         """
@@ -41,7 +53,35 @@ class YOLODetector:
         """
         image = Image.open(image_path).convert("RGB")
         frame = np.asarray(image, dtype=np.uint8)
-        return self._detect_grid_style(frame)
+
+        if self.model is None:
+            return self._detect_grid_style(frame)
+
+        results = self.model.predict(source=frame, verbose=False)
+        if not results:
+            return []
+
+        detections: list[Detection] = []
+        result = results[0]
+        names = getattr(result, "names", {}) or {}
+
+        for box in result.boxes:
+            xyxy = box.xyxy[0].tolist()
+            conf = float(box.conf[0].item()) if box.conf is not None else 0.0
+            cls = int(box.cls[0].item()) if box.cls is not None else -1
+            name = names.get(cls, "unknown")
+
+            detections.append(
+                Detection(
+                    class_id=cls,
+                    class_name=name,
+                    confidence=conf,
+                    bbox=(float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])),
+                )
+            )
+
+        detections.sort(key=lambda d: d.confidence, reverse=True)
+        return detections
 
     def _detect_grid_style(self, frame: np.ndarray) -> list[Detection]:
         """Version rudimentaire type YOLO: une passe sur une grille."""
