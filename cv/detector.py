@@ -39,9 +39,80 @@ class YOLODetector:
             self.model = None
             return
         weights = self.model_name if self.model_name.endswith(".pt") else f"{self.model_name}.pt"
-        self.model = YOLO(weights)
+        safe_globals = self._allow_ultralytics_safe_globals()
+        try:
+            import torch
+        except Exception:
+            self.model = YOLO(weights)
+            return
 
-    def detect(self, image_path: str) -> list[Detection]:
+        serialization = getattr(torch, "serialization", None)
+        safe_context = getattr(serialization, "safe_globals", None) if serialization else None
+
+        # Force weights_only=False for trusted checkpoints (Ultralytics).
+        original_load = getattr(torch, "load", None)
+        def _patched_load(*args, **kwargs):
+            kwargs.setdefault("weights_only", False)
+            return original_load(*args, **kwargs)
+
+        try:
+            if callable(original_load):
+                torch.load = _patched_load
+            if safe_globals and callable(safe_context):
+                with safe_context(safe_globals):
+                    self.model = YOLO(weights)
+            else:
+                self.model = YOLO(weights)
+        finally:
+            if callable(original_load):
+                torch.load = original_load
+
+    def _allow_ultralytics_safe_globals(self) -> list[type]:
+        """Allowlist Ultralytics classes for torch.load safety checks."""
+        try:
+            import torch
+            from ultralytics.nn.tasks import DetectionModel
+        except Exception:
+            return []
+
+        serialization = getattr(torch, "serialization", None)
+        if serialization is None:
+            return []
+
+        add_safe_globals = getattr(serialization, "add_safe_globals", None)
+        if callable(add_safe_globals):
+            safe_globals = [DetectionModel]
+            try:
+                from torch.nn.modules.container import ModuleList, ModuleDict, Sequential
+                safe_globals.extend([ModuleList, ModuleDict, Sequential])
+            except Exception:
+                pass
+            for module_path, names in (
+                ("ultralytics.nn.modules", ["Conv", "C2f", "C3", "SPPF", "Bottleneck", "Concat", "Detect", "DFL", "DWConv"]),
+                ("ultralytics.nn.modules.conv", ["Conv", "DWConv"]),
+                ("ultralytics.nn.modules.block", ["C2f", "C3", "SPPF", "Bottleneck", "Concat", "Detect", "DFL"]),
+            ):
+                try:
+                    module = __import__(module_path, fromlist=names)
+                except Exception:
+                    continue
+                for name in names:
+                    obj = getattr(module, name, None)
+                    if obj is not None:
+                        safe_globals.append(obj)
+            add_safe_globals(safe_globals)
+            return safe_globals
+
+        return []
+
+    def detect(
+        self,
+        image_path: str,
+        *,
+        conf: float = 0.25,
+        iou: float = 0.7,
+        classes: list[int] | list[str] | None = None,
+    ) -> list[Detection]:
         """
         Détecter les objets dans l'image.
         
@@ -57,7 +128,7 @@ class YOLODetector:
         if self.model is None:
             return self._detect_grid_style(frame)
 
-        results = self.model.predict(source=frame, verbose=False)
+        results = self.model.predict(source=frame, verbose=False, conf=conf, iou=iou)
         if not results:
             return []
 
@@ -79,6 +150,16 @@ class YOLODetector:
                     bbox=(float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])),
                 )
             )
+
+        if classes:
+            class_ids = {c for c in classes if isinstance(c, int)}
+            class_names = {str(c) for c in classes if isinstance(c, str)}
+            detections = [
+                det
+                for det in detections
+                if (not class_ids or det.class_id in class_ids)
+                and (not class_names or det.class_name in class_names)
+            ]
 
         detections.sort(key=lambda d: d.confidence, reverse=True)
         return detections

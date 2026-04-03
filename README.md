@@ -52,6 +52,12 @@ python scripts/validate_dataset.py
 python scripts/test_yolo_on_data.py --data data --model yolov8n
 ```
 
+### Sortie détections + validation
+```bash
+python scripts/test_yolo_on_data.py --data data/test --model yolov8n --max 50 --out outputs/detections.json
+python scripts/validate_detections.py --input outputs/detections.json --classes car,person,truck,traffic\ light
+```
+
 ### Évaluation Risque
 Scoring basé sur classes détectées + confiance:
 - Piétons/cyclistes = risque critique (0.85-0.95)
