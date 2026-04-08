@@ -6,7 +6,7 @@ from LLM.tool import calculDistance
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv() #juste pour charger le.env
 api_key = os.getenv("API_KEY")
 if not api_key:
     raise ValueError("API_KEY is missing. Please set it in the .env file.")
