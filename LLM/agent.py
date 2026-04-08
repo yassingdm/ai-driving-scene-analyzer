@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv() #juste pour charger le.env
 api_key = os.getenv("API_KEY")
 if not api_key:
-    raise ValueError("API_KEY is missing. Please set it in the .env file.")
+    raise ValueError("Il manque la clé.")
 
 client = Groq(api_key=api_key)
 
@@ -28,8 +28,12 @@ def analyze_scene(detections_json):
     debut = base.find("{")
     fin = base.rfind("}") + 1
 
+    cleaned = base[debut:fin]
+    cleaned = cleaned.strip() #Supprime les caractères parasites autour
+    cleaned = cleaned.replace("```", "").replace("**", "")# Supprime backticks, markdown et étoiles
+
     if debut == -1 or fin == 0:
         raise ValueError("Le LLM n'a pas renvoyé de JSON. Réponse brute : " + base)
 
-    leJson = base[debut:fin]
-    return json.loads(leJson)
+    
+    return json.loads(cleaned)
