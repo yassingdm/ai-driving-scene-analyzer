@@ -2,6 +2,7 @@ from groq import Groq
 import json
 from LLM.system_prompt import SYSTEM_PROMPT
 from LLM.tool import calculDistance
+from LLM.tool import CalculDistance_tool
 
 import os
 from dotenv import load_dotenv
@@ -21,7 +22,9 @@ def analyze_scene(detections_json):
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
-        messages=messages
+        messages=messages,
+        tools=[CalculDistance_tool], 
+        tool_choice="auto"     
     )
 
     base = response.choices[0].message.content
