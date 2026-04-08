@@ -37,6 +37,15 @@ data/
 python scripts/validate_dataset.py
 ```
 
+**Conversion BDD100K -> YOLO (annotations):**
+```bash
+python scripts/convert_bdd100k_to_yolo.py \
+	--labels path/to/bdd100k_labels_images_train.json \
+	--images data/train \
+	--out data/train/labels \
+	--write-empty
+```
+
 ### Classes (10)
 - **Critique:** pedestrian (0.95), cyclist (0.85), motorcycle (0.80)
 - **Véhicules:** truck (0.70), bus (0.60), car (0.40)
@@ -50,6 +59,16 @@ python scripts/validate_dataset.py
 ### Phase 2: Test YOLO pré-entraîné
 ```bash
 python scripts/test_yolo_on_data.py --data data --model yolov8n
+```
+
+### Phase 3: Fine-tuning YOLO sur BDD100K
+```bash
+python scripts/train_yolo.py \
+	--data data/data.yaml \
+	--model yolov8n.pt \
+	--epochs 50 \
+	--imgsz 640 \
+	--batch 16
 ```
 
 ### Sortie détections + validation

@@ -25,11 +25,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Tester YOLO sur data/")
     parser.add_argument("--data", default="data", help="Dossier a analyser")
     parser.add_argument("--model", default="yolov8n", help="Nom du modele YOLO")
-    parser.add_argument("--conf", type=float, default=0.25, help="Seuil de confiance")
-    parser.add_argument("--iou", type=float, default=0.7, help="Seuil IoU NMS")
+    parser.add_argument("--conf", type=float, default=0.4, help="Seuil de confiance")
+    parser.add_argument("--iou", type=float, default=0.5, help="Seuil IoU NMS")
     parser.add_argument(
         "--classes",
-        default="",
+        default="car,truck,bus,person,bicycle,motorcycle,traffic light,stop sign,train",
         help="Liste de classes separees par virgule (ex: car,person,truck)",
     )
     parser.add_argument("--out", default="", help="Chemin de sortie JSON")
