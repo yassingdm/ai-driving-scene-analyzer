@@ -61,6 +61,16 @@ python scripts/convert_bdd100k_to_yolo.py \
 python scripts/test_yolo_on_data.py --data data --model yolov8n
 ```
 
+### Phase 3: Fine-tuning YOLO sur BDD100K
+```bash
+python scripts/train_yolo.py \
+	--data data/data.yaml \
+	--model yolov8n.pt \
+	--epochs 50 \
+	--imgsz 640 \
+	--batch 16
+```
+
 ### Sortie détections + validation
 ```bash
 python scripts/test_yolo_on_data.py --data data/test --model yolov8n --max 50 --out outputs/detections.json
