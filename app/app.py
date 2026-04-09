@@ -4,7 +4,7 @@ import os
 import cv2
 from PIL import Image
 import json
-
+from gtts import gTTS
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
