@@ -100,6 +100,10 @@ if uploaded_file is not None:
                     st.write("**Recommandations :**")
                     st.write(rapport_llm.get("Recommandations", "N/A"))
                     
+                    texte_vocal = f"Attention, niveau de risque {niveau_risque}. {resume}. Recommandation : {recommandations}"
+                    audio_path = generate_audio(texte_vocal)
+                    st.audio(audio_path, format="audio/mp3")
+            
             except Exception as e:
                 st.error(f"Une erreur est survenue lors de l'analyse : {e}")
             
