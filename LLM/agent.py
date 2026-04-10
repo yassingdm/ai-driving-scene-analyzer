@@ -1,6 +1,8 @@
 from groq import Groq
 import json
 from LLM.system_prompt import SYSTEM_PROMPT
+from LLM.system_prompt_reduct import SYSTEM_PROMPT_REDUCT
+from LLM.instruction_prompt import INSTRUCTION_PROMPT
 from LLM.tool import calculDistance
 from LLM.tool import CalculDistance_tool
 
@@ -16,15 +18,16 @@ client = Groq(api_key=api_key)
 
 def analyze_scene(detections_json):
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": SYSTEM_PROMPT_REDUCT},
+        {"role": "user", "content": INSTRUCTION_PROMPT},
         {"role": "user", "content": f"Voici les détections JSON : {detections_json}"}
     ]
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=messages,
-        tools=[CalculDistance_tool], 
-        tool_choice="auto"     
+        #tools=[CalculDistance_tool], 
+        #tool_choice="auto"     
     )
 
     base = response.choices[0].message.content
