@@ -9,18 +9,11 @@ Analyse la scène de conduite suivante et produis un JSON strict avec exactement
   "recommandations": ""
 }
 
-Exemple de réponse attendue :
+Signification des champs :
+- "resume" : description synthétique de la scène.
+- "objets_detectes" : résumé textuel des objets importants (voitures, camions, piétons, feux, etc.).
+- "analyse_risques" : analyse des risques principaux (collision, piétons proches, visibilité, etc.).
+- "niveau_risque" : un seul mot parmi : "Faible", "Moyen", "Élevé", "Critique".
+- "recommandations" : conseils de conduite concrets et adaptés à la situation.
 
-{
-  "resume": "Une voiture et un piéton sur un passage piéton.",
-  "objets_detectes": "car, person",
-  "analyse_risques": "Le piéton est proche de la trajectoire de la voiture.",
-  "niveau_risque": "Élevé",
-  "recommandations": "Ralentir immédiatement et se préparer à s’arrêter."
-}
-
-Contraintes :
-- Pas de texte avant ou après le JSON.
-- Pas de commentaires.
-- Pas de markdown.
 """
