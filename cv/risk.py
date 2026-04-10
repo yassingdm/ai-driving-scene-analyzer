@@ -11,8 +11,8 @@ WEIGHTS = {
     "bus": 0.60,             # Moyen-élevé - bus
     "car": 0.40,             # Moyen - voiture
     "rider": 0.75,           # Élevé - rider sur deux-roues
-    "traffic light": 0.15,   # Faible - contexte seulement
-    "traffic sign": 0.10,    # Très faible - contexte seulement
+    "traffic_light": 0.15,   # Faible - contexte seulement
+    "traffic_sign": 0.10,    # Très faible - contexte seulement
     "train": 0.50,           # Moyen - train (rare en dashcam)
 }
 

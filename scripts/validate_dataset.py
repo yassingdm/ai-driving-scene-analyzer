@@ -36,7 +36,15 @@ def validate_dataset(data_dir: Path = Path("data")) -> bool:
         return False
     print(f"✓ data.yaml trouvé")
 
-    stats = {"train": 0, "val": 0, "test": 0, "total_size_mb": 0.0}
+    stats = {
+        "train": 0,
+        "val": 0,
+        "test": 0,
+        "total_size_mb": 0.0,
+        "labels": {"train": 0, "val": 0, "test": 0},
+        "missing_labels": {"train": 0, "val": 0, "test": 0},
+        "extra_labels": {"train": 0, "val": 0, "test": 0},
+    }
     image_extensions = {".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG"}
 
     # Valider chaque split (direct dans data/)
@@ -47,10 +55,7 @@ def validate_dataset(data_dir: Path = Path("data")) -> bool:
             print(f"✗ Répertoire manquant: data/{split}/")
             return False
 
-        images = sorted([
-            f for f in split_dir.iterdir() 
-            if f.suffix in image_extensions
-        ])
+        images = sorted([f for f in split_dir.iterdir() if f.suffix in image_extensions])
 
         if not images:
             print(f"✗ Pas d'images dans data/{split}/")
@@ -59,8 +64,21 @@ def validate_dataset(data_dir: Path = Path("data")) -> bool:
         size_mb = sum(f.stat().st_size for f in images) / (1024 ** 2)
         stats[split] = len(images)
         stats["total_size_mb"] += size_mb
-        
-        print(f"✓ {split:5} : {len(images):4} images ({size_mb:7.1f} MB)")
+
+        labels_dir = split_dir / "labels"
+        if labels_dir.exists():
+            label_files = sorted([f for f in labels_dir.iterdir() if f.suffix == ".txt"])
+            stats["labels"][split] = len(label_files)
+            image_stems = {f.stem for f in images}
+            label_stems = {f.stem for f in label_files}
+            stats["missing_labels"][split] = len(image_stems - label_stems)
+            stats["extra_labels"][split] = len(label_stems - image_stems)
+            print(
+                f"✓ {split:5} : {len(images):4} images ({size_mb:7.1f} MB) | "
+                f"labels: {len(label_files):4}"
+            )
+        else:
+            print(f"✓ {split:5} : {len(images):4} images ({size_mb:7.1f} MB) | labels: none")
 
     # Résumé
     print("\n" + "=" * 50)
@@ -68,6 +86,18 @@ def validate_dataset(data_dir: Path = Path("data")) -> bool:
     print(f"Total images : {total}")
     print(f"Taille total : {stats['total_size_mb']:.1f} MB")
     print(f"Distribution : {stats['train']}/{stats['val']}/{stats['test']}")
+    print(
+        "Missing labels : "
+        f"{stats['missing_labels']['train']}/"
+        f"{stats['missing_labels']['val']}/"
+        f"{stats['missing_labels']['test']}"
+    )
+    print(
+        "Extra labels   : "
+        f"{stats['extra_labels']['train']}/"
+        f"{stats['extra_labels']['val']}/"
+        f"{stats['extra_labels']['test']}"
+    )
     print("Dataset valide ✓")
     
     return True
