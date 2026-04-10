@@ -3,7 +3,10 @@ import json
 import re
 import unicodedata
 from LLM.system_prompt import SYSTEM_PROMPT
+from LLM.system_prompt_reduct import SYSTEM_PROMPT_REDUCT
+from LLM.instruction_prompt import INSTRUCTION_PROMPT
 from LLM.tool import calculDistance
+from LLM.tool import CalculDistance_tool
 
 import os
 from dotenv import load_dotenv
@@ -11,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv() #juste pour charger le.env
 api_key = os.getenv("API_KEY")
 if not api_key:
-    raise ValueError("API_KEY is missing. Please set it in the .env file.")
+    raise ValueError("Il manque la clé.")
 
 client = Groq(api_key=api_key)
 

@@ -26,5 +26,4 @@ CalculDistance_tool = {
         },
         "required": ["bbox1", "bbox2"]
     },
-    "function": calculDistance
 }
