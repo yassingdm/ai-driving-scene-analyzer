@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image
 
+from cv.bdd_classes import BDD_CLASSES, COCO_TO_BDD
+
 try:
     from ultralytics import YOLO
 except Exception:  # pragma: no cover - dependance optionnelle
@@ -67,6 +69,48 @@ class YOLODetector:
             if callable(original_load):
                 torch.load = original_load
 
+    def _normalize_label(self, label: str) -> str:
+        """Normaliser les labels YOLO vers l'espace de classes BDD100K."""
+        normalized = str(label or "").strip().lower().replace("-", " ")
+        mapped = COCO_TO_BDD.get(normalized, normalized.replace(" ", "_"))
+        return mapped
+
+    def _resolve_model_class_ids(
+        self,
+        classes: list[int] | list[str] | None,
+        *,
+        raw_output: bool,
+    ) -> list[int] | None:
+        """Convertit un filtre de classes (noms/ids) en ids du modèle YOLO."""
+        if not classes or self.model is None:
+            return None
+
+        names = getattr(self.model, "names", {}) or {}
+        if not isinstance(names, dict) or not names:
+            return None
+
+        direct_ids = {c for c in classes if isinstance(c, int)}
+        requested_names: set[str] = set()
+        for c in classes:
+            if isinstance(c, str):
+                if raw_output:
+                    requested_names.add(str(c).strip().lower().replace("_", " "))
+                else:
+                    requested_names.add(self._normalize_label(c))
+
+        resolved_ids = set(direct_ids)
+        for idx, raw_name in names.items():
+            raw_norm = str(raw_name).strip().lower().replace("_", " ")
+            mapped_norm = self._normalize_label(raw_norm)
+            if raw_output:
+                if raw_norm in requested_names:
+                    resolved_ids.add(int(idx))
+            else:
+                if mapped_norm in requested_names:
+                    resolved_ids.add(int(idx))
+
+        return sorted(resolved_ids) if resolved_ids else None
+
     def _allow_ultralytics_safe_globals(self) -> list[type]:
         """Allowlist Ultralytics classes for torch.load safety checks."""
         try:
@@ -112,6 +156,7 @@ class YOLODetector:
         conf: float = 0.25,
         iou: float = 0.7,
         classes: list[int] | list[str] | None = None,
+        raw_output: bool = False,
     ) -> list[Detection]:
         """
         Détecter les objets dans l'image.
@@ -128,19 +173,34 @@ class YOLODetector:
         if self.model is None:
             return self._detect_grid_style(frame)
 
-        results = self.model.predict(source=frame, verbose=False, conf=conf, iou=iou)
+        model_class_ids = self._resolve_model_class_ids(classes, raw_output=raw_output)
+        predict_kwargs = {
+            "source": frame,
+            "verbose": False,
+            "conf": conf,
+            "iou": iou,
+        }
+        if model_class_ids:
+            predict_kwargs["classes"] = model_class_ids
+
+        results = self.model.predict(**predict_kwargs)
         if not results:
             return []
 
         detections: list[Detection] = []
         result = results[0]
-        names = getattr(result, "names", {}) or {}
+        names = getattr(result, "names", {}) or getattr(self.model, "names", {}) or {}
 
         for box in result.boxes:
             xyxy = box.xyxy[0].tolist()
             conf = float(box.conf[0].item()) if box.conf is not None else 0.0
             cls = int(box.cls[0].item()) if box.cls is not None else -1
-            name = names.get(cls, "unknown")
+            raw_name = str(names.get(cls, names.get(str(cls), "unknown")))
+            name = raw_name if raw_output else self._normalize_label(raw_name)
+
+            # Sans fine-tuning, on garde uniquement les classes cibles de conduite.
+            if not raw_output and name not in BDD_CLASSES:
+                continue
 
             detections.append(
                 Detection(
@@ -153,12 +213,32 @@ class YOLODetector:
 
         if classes:
             class_ids = {c for c in classes if isinstance(c, int)}
-            class_names = {str(c) for c in classes if isinstance(c, str)}
+
+            if raw_output:
+                class_names = {
+                    str(c).strip().lower().replace("_", " ")
+                    for c in classes
+                    if isinstance(c, str)
+                }
+            else:
+                class_names = {
+                    self._normalize_label(str(c))
+                    for c in classes
+                    if isinstance(c, str)
+                }
+
             detections = [
                 det
                 for det in detections
                 if (not class_ids or det.class_id in class_ids)
-                and (not class_names or det.class_name in class_names)
+                and (
+                    not class_names
+                    or (
+                        (det.class_name.lower().replace("_", " ") in class_names)
+                        if raw_output
+                        else (det.class_name in class_names)
+                    )
+                )
             ]
 
         detections.sort(key=lambda d: d.confidence, reverse=True)
