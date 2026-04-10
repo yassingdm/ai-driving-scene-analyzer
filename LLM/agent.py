@@ -2,9 +2,11 @@ from groq import Groq
 import json
 import re
 import unicodedata
-from LLM.system_prompt import SYSTEM_PROMPT
+#from LLM.system_prompt import SYSTEM_PROMPT
 from LLM.system_prompt_reduct import SYSTEM_PROMPT_REDUCT
-from LLM.instruction_prompt import INSTRUCTION_PROMPT
+from LLM.structure_prompt import INSTRUCTION_PROMPT
+from LLM.fields_prompt import FIELDS_PROMPT
+from LLM.exemple_prompt import EXEMPLES_PROMPT
 from LLM.tool import calculDistance
 from LLM.tool import CalculDistance_tool
 
@@ -143,7 +145,11 @@ def _normalize_report(report: dict, raw_text: str) -> dict:
 
 def analyze_scene(detections_json):
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": SYSTEM_PROMPT_REDUCT},
+        {"role": "user", "content": STRUCTURE_PROMPT},
+        {"role": "user", "content": FIELDS_PROMPT},
+        {"role": "user", "content": EXAMPLES_PROMPT},
+        {"role": "user", "content": CONSTRAINTS_PROMPT},
         {
             "role": "user",
             "content": (
