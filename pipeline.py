@@ -5,10 +5,12 @@ from LLM.agent import analyze_scene
 with open("outputs/detections.json", "r") as f:
     data = json.load(f)
 
-detections = []
 for entry in data["results"]:
-    for det in entry["detections"]:
-        detections.append(det)
+    detections = entry["detections"]
+    detections_reduites = [...]
+    rapport = analyze_scene(detections_reduites)
+    print(rapport)
+
 
 detections_reduites = [
     {

@@ -1,7 +1,10 @@
 from groq import Groq
 import json
 from LLM.system_prompt import SYSTEM_PROMPT
+from LLM.system_prompt_reduct import SYSTEM_PROMPT_REDUCT
+from LLM.instruction_prompt import INSTRUCTION_PROMPT
 from LLM.tool import calculDistance
+from LLM.tool import CalculDistance_tool
 
 import os
 from dotenv import load_dotenv
@@ -9,27 +12,34 @@ from dotenv import load_dotenv
 load_dotenv() #juste pour charger le.env
 api_key = os.getenv("API_KEY")
 if not api_key:
-    raise ValueError("API_KEY is missing. Please set it in the .env file.")
+    raise ValueError("Il manque la clé.")
 
 client = Groq(api_key=api_key)
 
 def analyze_scene(detections_json):
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": SYSTEM_PROMPT_REDUCT},
+        {"role": "user", "content": INSTRUCTION_PROMPT},
         {"role": "user", "content": f"Voici les détections JSON : {detections_json}"}
     ]
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
-        messages=messages
+        messages=messages,
+        #tools=[CalculDistance_tool], 
+        #tool_choice="auto"     
     )
 
     base = response.choices[0].message.content
     debut = base.find("{")
     fin = base.rfind("}") + 1
 
+    cleaned = base[debut:fin]
+    cleaned = cleaned.strip() #Supprime les caractères parasites autour
+    cleaned = cleaned.replace("```", "").replace("**", "")# Supprime backticks, markdown et étoiles
+
     if debut == -1 or fin == 0:
         raise ValueError("Le LLM n'a pas renvoyé de JSON. Réponse brute : " + base)
 
-    leJson = base[debut:fin]
-    return json.loads(leJson)
+    
+    return json.loads(cleaned)
