@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from cv.detector import YOLODetector
 from LLM.agent import analyze_scene
-from cv.visualize_detections import color_for_name
+from scripts.visualize_detections import color_for_name
 
 
 st.set_page_config(page_title="Analyseur de Scènes de Conduite", layout="wide")
