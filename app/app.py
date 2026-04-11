@@ -18,11 +18,11 @@ from scripts.visualize_detections import color_for_name
 EXPERTS_YOLO = {
     "classique ": "yolov8n",
     "Expert autoroute ": "yolov8n",
-    "Expert nuit ": "yolov8s",
-    "Expert parking ": "yolov8m",
-    "Expert piétons ": "yolov8l",
-    "Expert pluie_brouillard ": "chemin/vers/modele_pietons.pt",
-    "Expert urbain ": "chemin/vers/modele_nuit.pt",
+    "Expert nuit ": "yolov8n",
+    "Expert parking ": "yolov8n",
+    "Expert piétons ": "yolov8n",
+    "Expert pluie_brouillard ": "yolov8nt",
+    "Expert urbain ": "yolov8n",
 }
 
 st.set_page_config(page_title="Analyseur de Scènes de Conduite", layout="wide")
