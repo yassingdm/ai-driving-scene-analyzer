@@ -1,109 +1,87 @@
-"""
-Valider l'intégrité du dataset BDD100K.
-
-Structure attendue:
-data/
-├── data.yaml
-├── train/  (images JPG)
-├── val/    (images JPG)
-└── test/   (images JPG)
-"""
-
 import sys
+import os
+import yaml
 from pathlib import Path
 
-
-def validate_dataset(data_dir: Path = Path("data")) -> bool:
-    """
-    Valider structure et intégrité du dataset.
-    
-    Arguments:
-        data_dir: Répertoire data/
-    
-    Retourne:
-        True si structure valide et images présentes
-    """
-    data_dir = Path(data_dir)
-    
-    if not data_dir.exists():
-        print(f"Répertoire data/ non trouvé: {data_dir}")
+def validate_expert_dataset(yaml_path):
+    yaml_path = Path(yaml_path)
+    if not yaml_path.exists():
+        print(f"✗ Fichier YAML introuvable : {yaml_path}")
         return False
 
-    # Vérifier data.yaml
-    yaml_file = data_dir / "data.yaml"
-    if not yaml_file.exists():
-        print(f"Configuration manquante: {yaml_file}")
-        return False
-    print(f"✓ data.yaml trouvé")
-
-    stats = {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total_size_mb": 0.0,
-        "labels": {"train": 0, "val": 0, "test": 0},
-        "missing_labels": {"train": 0, "val": 0, "test": 0},
-        "extra_labels": {"train": 0, "val": 0, "test": 0},
+    # 1. Charger le YAML pour trouver les playlists
+    with open(yaml_path, 'r') as f:
+        config = yaml.safe_load(f)
+    
+    playlists = {
+        "train": config.get('train'),
+        "val": config.get('val')
     }
-    image_extensions = {".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG"}
 
-    # Valider chaque split (direct dans data/)
-    for split in ["train", "val", "test"]:
-        split_dir = data_dir / split
-        
-        if not split_dir.exists():
-            print(f"✗ Répertoire manquant: data/{split}/")
-            return False
-
-        images = sorted([f for f in split_dir.iterdir() if f.suffix in image_extensions])
-
-        if not images:
-            print(f"✗ Pas d'images dans data/{split}/")
-            return False
-
-        size_mb = sum(f.stat().st_size for f in images) / (1024 ** 2)
-        stats[split] = len(images)
-        stats["total_size_mb"] += size_mb
-
-        labels_dir = split_dir / "labels"
-        if labels_dir.exists():
-            label_files = sorted([f for f in labels_dir.iterdir() if f.suffix == ".txt"])
-            stats["labels"][split] = len(label_files)
-            image_stems = {f.stem for f in images}
-            label_stems = {f.stem for f in label_files}
-            stats["missing_labels"][split] = len(image_stems - label_stems)
-            stats["extra_labels"][split] = len(label_stems - image_stems)
-            print(
-                f"✓ {split:5} : {len(images):4} images ({size_mb:7.1f} MB) | "
-                f"labels: {len(label_files):4}"
-            )
-        else:
-            print(f"✓ {split:5} : {len(images):4} images ({size_mb:7.1f} MB) | labels: none")
-
-    # Résumé
-    print("\n" + "=" * 50)
-    total = sum(stats[k] for k in ["train", "val", "test"])
-    print(f"Total images : {total}")
-    print(f"Taille total : {stats['total_size_mb']:.1f} MB")
-    print(f"Distribution : {stats['train']}/{stats['val']}/{stats['test']}")
-    print(
-        "Missing labels : "
-        f"{stats['missing_labels']['train']}/"
-        f"{stats['missing_labels']['val']}/"
-        f"{stats['missing_labels']['test']}"
-    )
-    print(
-        "Extra labels   : "
-        f"{stats['extra_labels']['train']}/"
-        f"{stats['extra_labels']['val']}/"
-        f"{stats['extra_labels']['test']}"
-    )
-    print("Dataset valide ✓")
+    print(f"🔎 Validation de l'expert : {yaml_path.stem.upper()}")
     
-    return True
+    all_ok = True
+    for split, path in playlists.items():
+        if not path:
+            print(f"✗ Pas de chemin '{split}' défini dans le YAML")
+            continue
+        
+        playlist_file = Path(path)
+        if not playlist_file.exists():
+            print(f"✗ Playlist {split} introuvable : {playlist_file}")
+            all_ok = False
+            continue
 
+        # 2. Lire la playlist et vérifier les fichiers
+        with open(playlist_file, 'r') as f:
+            lines = [line.strip() for line in f.readlines() if line.strip()]
+        
+        print(f"--- Analyse du split {split} ({len(lines)} images) ---")
+        
+        missing_images = 0
+        missing_labels = 0
+        
+        for img_path_str in lines:
+            img_path = Path(img_path_str)
+            
+            # Vérifier l'image
+            if not img_path.exists():
+                missing_images += 1
+                continue
+            
+            # Vérifier le label (YOLO cherche labels/ à la place de images/)
+            # Exemple: images/train/001.jpg -> labels/train/001.txt
+            label_path = Path(img_path_str.replace('images', 'labels')).with_suffix('.txt')
+            
+            if not label_path.exists():
+                missing_labels += 1
+
+        if missing_images > 0:
+            print(f"  ✗ {missing_images} images introuvables au chemin indiqué.")
+            all_ok = False
+        if missing_labels > 0:
+            print(f"  ✗ {missing_labels} labels (.txt) manquants dans le dossier labels/.")
+            all_ok = False
+        
+        if missing_images == 0 and missing_labels == 0:
+            print(f"  ✓ Split {split} valide.")
+
+    return all_ok
 
 if __name__ == "__main__":
-    data_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("data")
-    success = validate_dataset(data_dir)
+    # Vous pouvez passer le nom d'un yaml spécifique en argument
+    # Exemple: python validate_playlist_dataset.py data/data_nuit.yaml
+    if len(sys.argv) > 1:
+        target = sys.argv[1]
+        success = validate_expert_dataset(target)
+    else:
+        print("Test de tous les fichiers YAML dans data/...")
+        yaml_files = list(Path("data").glob("*.yaml"))
+        success = True
+        for y in yaml_files:
+            if not validate_expert_dataset(y):
+                success = False
+    
+    if success:
+        print("\n🏆 Tout est prêt pour l'entraînement !")
     sys.exit(0 if success else 1)

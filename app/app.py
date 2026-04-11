@@ -11,9 +11,21 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from cv.detector import YOLODetector
+from huggingface_hub import hf_hub_download
 from LLM.agent import analyze_scene
 from scripts.visualize_detections import color_for_name
 
+EXPERTS_YOLO = {
+    "classique ": "yolov8n",
+    "Expert autoroute ": "yolov8n",
+    "Expert nuit ": "yolov8n",
+    "Expert parking ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:parkingv1.pt",
+    "Expert piétons ": "yolov8n",
+    "Expert pluie_brouillard ": "yolov8n",
+    "Expert urbain ": "yolov8n",
+    "Expert scolaire ": "yolov8n",
+
+}
 
 st.set_page_config(page_title="Analyseur de Scènes de Conduite", layout="wide")
 st.title("Analyseur Intelligent de Scènes de Conduite")
@@ -36,6 +48,10 @@ if EXPECTED_VENV_PYTHON.exists():
 DEFAULT_CLASSES_CSV = "car,truck,bus,person,bicycle,motorcycle,traffic light,stop sign,train"
 
 with st.sidebar:
+    st.header("Choix de l'Expert (Modèle)")
+    nom_expert = st.selectbox("Sélectionnez le modele :", list(EXPERTS_YOLO.keys()))
+    modele_yolo_selectionne = EXPERTS_YOLO[nom_expert]
+
     st.header("Paramètres CV")
     conf_threshold = st.slider("Seuil confiance", 0.1, 0.9, 0.4, 0.05)
     iou_threshold = st.slider("Seuil IoU", 0.1, 0.9, 0.5, 0.05)
@@ -48,10 +64,27 @@ with st.sidebar:
         st.rerun()
 
 @st.cache_resource
-def load_model():
-    return YOLODetector("yolov8n")
+def load_model(modelname):
+    if modelname.startswith("hf://"):
+        try:
+            # On sépare hf://repo_id:filename
+            path_data = modelname.replace("hf://", "")
+            repo_id, filename = path_data.split(":")
+            
+            with st.spinner(f"Téléchargement du modèle expert depuis Hugging Face..."):
+                model_path = hf_hub_download(
+                    repo_id=repo_id, 
+                    filename=filename,
+                    local_dir="models" # Dossier où stocker les modèles
+                )
+            return YOLODetector(model_path)
+        except Exception as e:
+            st.error(f"Erreur lors du téléchargement Hugging Face : {e}")
+            return YOLODetector("yolov8n.pt")
+    
+    return YOLODetector(modelname)
 
-detector = load_model()
+detector = load_model(modele_yolo_selectionne)
 
 if detector.model is None:
     st.warning(
