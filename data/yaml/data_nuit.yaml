@@ -1,0 +1,14 @@
+train: /home/bastos/cours/projIA/ai-driving-scene-analyzer/data/txt/train_nuit.txt
+val: /home/bastos/cours/projIA/ai-driving-scene-analyzer/data/txt/val_nuit.txt
+nc: 10
+names:
+  0: car
+  1: truck
+  2: bus
+  3: pedestrian
+  4: cyclist
+  5: motorcycle
+  6: traffic_light
+  7: traffic_sign
+  8: rider
+  9: train
