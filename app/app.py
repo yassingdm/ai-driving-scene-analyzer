@@ -21,7 +21,11 @@ EXPERTS_YOLO = {
     "Expert nuit ": "yolov8n",
     "Expert parking ": "yolov8n",
     "Expert piétons ": "yolov8n",
+<<<<<<< HEAD
     "Expert pluie_brouillard ": "yolov8nt",
+=======
+    "Expert pluie_brouillard ": "yolov8n",
+>>>>>>> 577423c (corrections sur l'app streamlit)
     "Expert urbain ": "yolov8n",
 }
 
