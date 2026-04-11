@@ -41,6 +41,7 @@ Créer un fichier `.env` à la racine:
 
 ```env
 API_KEY=<votre_cle_groq>
+PROJECT_PATH=<chemin_absolu_dossier_parent_projet>
 ```
 
 ## Lancer l'application (important)

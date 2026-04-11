@@ -3,10 +3,12 @@ import sys
 import argparse
 import os
 from pathlib import Path
-path="/home/bastos/cours/projIA/ai-driving-scene-analyzer"
+from dotenv import load_dotenv
+load_dotenv()
+DEFAULT_PATH = Path(__file__).resolve().parent.parent
+path= os.getenv("PROJECT_PATH",str(DEFAULT_PATH))
 
 def run_step(command):
-    print(f"\n--- EXÉCUTION : {command} ---")
     process = subprocess.run(command, shell=True)
     if process.returncode != 0:
         sys.exit(1)
@@ -28,18 +30,25 @@ def main():
     print(f"Démarrage de l'entrainement pour : {scenario.upper()}")
 
     if not os.path.exists(f"{path}/data/labels/train") or not os.path.exists(f"{path}/data/labels/val"):
-        run_step(f"python3 {path}/scripts/convert_bdd100k_to_yolo.py --labels {path}/data/bdd100kFiles/labels/det_v2_train_release.json --images {path}/data/bdd100kFiles/bdd100k/bdd100k/images/100k/train --out {path}/data/labels/train")
-        run_step(f"python3 {path}/scripts/convert_bdd100k_to_yolo.py --labels {path}/data/bdd100kFiles/labels/det_v2_val_release.json --images {path}/data/bdd100kFiles/bdd100k/bdd100k/images/100k/val --out {path}/data/labels/val")
-    
+        print("Conversion des labels au format YOLO")
+        run_step(f"python3 {path}/scripts/convert_bdd100k_to_yolo.py --labels {path}/data/det_v2_train_release.json --images {path}/data/images/train --out {path}/data/labels/train")
+        run_step(f"python3 {path}/scripts/convert_bdd100k_to_yolo.py --labels {path}/data/det_v2_val_release.json --images {path}/data/images/val --out {path}/data/labels/val")
+    else:
+        print("Les labels YOLO existent déjà")
 
-    run_step(f"python3 {path}/scripts/scenario_data_classifier.py")
+    if not os.path.exists(f"{path}/data/txt/train_urbain.txt") or not os.path.exists(f"{path}/data/txt/val_urbain.txt"):
+        print("Classification des scénarios")
+        run_step(f"python3 {path}/scripts/scenario_data_classifier.py")
+    else:
+        print("Les scénarios sont déjà classifiés")
 
+    print("Validation de la structure des données")
     run_step(f"python3 {path}/scripts/validate_dataset.py")
 
-   
+    
     cmd_train = (f"python3 {path}/scripts/train_yolo.py --data {args.data} --model {args.model} "
                  f"--epochs {args.epochs} --imgsz {args.imgsz} --batch {args.batch} --name {run_name}")
-    
+    print("Lancement de l'entraînement YOLO")
     run_step(cmd_train)
 
     print(f"  Le modèle est sauvegardé dans runs/train/{run_name}/weights/best.pt")

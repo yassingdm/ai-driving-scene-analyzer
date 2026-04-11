@@ -19,10 +19,12 @@ EXPERTS_YOLO = {
     "classique ": "yolov8n",
     "Expert autoroute ": "yolov8n",
     "Expert nuit ": "yolov8n",
-    "Expert parking ": "yolov8n",
+    "Expert parking ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:parkingv1.pt",
     "Expert piétons ": "yolov8n",
     "Expert pluie_brouillard ": "yolov8n",
     "Expert urbain ": "yolov8n",
+    "Expert scolaire ": "yolov8n",
+
 }
 
 st.set_page_config(page_title="Analyseur de Scènes de Conduite", layout="wide")
@@ -63,6 +65,23 @@ with st.sidebar:
 
 @st.cache_resource
 def load_model(modelname):
+    if modelname.startswith("hf://"):
+        try:
+            # On sépare hf://repo_id:filename
+            path_data = modelname.replace("hf://", "")
+            repo_id, filename = path_data.split(":")
+            
+            with st.spinner(f"Téléchargement du modèle expert depuis Hugging Face..."):
+                model_path = hf_hub_download(
+                    repo_id=repo_id, 
+                    filename=filename,
+                    local_dir="models" # Dossier où stocker les modèles
+                )
+            return YOLODetector(model_path)
+        except Exception as e:
+            st.error(f"Erreur lors du téléchargement Hugging Face : {e}")
+            return YOLODetector("yolov8n.pt")
+    
     return YOLODetector(modelname)
 
 detector = load_model(modele_yolo_selectionne)

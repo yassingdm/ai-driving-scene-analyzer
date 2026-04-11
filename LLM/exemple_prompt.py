@@ -1,4 +1,4 @@
-EXEMPLE_PROMPT="""
+EXEMPLES_PROMPT="""
 Exemple de réponse attendue :
 {
   "resume": "Une voiture et un piéton sur un passage piéton.",

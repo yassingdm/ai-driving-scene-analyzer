@@ -1,20 +1,23 @@
 import json
 import os
-path="/home/bastos/cours/projIA/ai-driving-scene-analyzer"
-
-OUTPUT_DIR = '{path}/data/txt' 
+from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
+DEFAULT_PATH = Path(__file__).resolve().parent.parent
+path= os.getenv("PROJECT_PATH", str(DEFAULT_PATH))
+OUTPUT_DIR = f'{path}/data/txt' 
 
 TACHES = [
     {
         "nom": "ENTRAÎNEMENT",
-        "json_path": "{path}/data/det_v2_train_release.json",
-        "image_dir_prefix": "{path}/data/images/train/",
+        "json_path": f'{path}/data/det_v2_train_release.json',
+        "image_dir_prefix": f'{path}/data/images/train/',
         "fichier_prefix": "train_"
     },
     {
         "nom": "VALIDATION",
-        "json_path": "{path}/data/det_v2_val_release.json",
-        "image_dir_prefix": "{path}/data/images/val/",
+        "json_path": f'{path}/data/det_v2_val_release.json',
+        "image_dir_prefix": f'{path}/data/images/val/',
         "fichier_prefix": "val_"
     }
 ]
