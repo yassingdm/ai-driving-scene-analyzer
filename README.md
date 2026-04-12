@@ -6,9 +6,9 @@ Application de démonstration qui combine:
 - UI Streamlit (upload image + visualisation)
 
 ## Statut du projet
-- Etat actuel: pipeline fonctionnel avant fine-tuning.
-- Détection: modèle YOLO pré-entraîné.
-- Fine-tuning BDD100K: non démarré dans ce flux de run.
+- Etat actuel: pipeline fonctionnel avec modèle global entraîné.
+- Détection: modèle custom disponible (`best.pt`) + modèle YOLO de base en fallback.
+- Entraînement BDD100K: réalisé (train/val globaux générés).
 
 ## Pipeline
 Image -> YOLO -> JSON de détections -> LLM -> Rapport + audio
@@ -53,7 +53,7 @@ Toujours lancer Streamlit avec le Python du venv du projet:
 
 Ne pas utiliser `streamlit run app/app.py` sans préciser l'interpréteur, sinon Windows/Conda peut prendre un autre Python et YOLO ne sera pas chargé.
 
-## Paramètres CV recommandés (pré-fine-tuning)
+## Paramètres CV recommandés (post-entraînement)
 Dans la sidebar Streamlit:
 - Seuil confiance: 0.40
 - Seuil IoU: 0.50
@@ -62,27 +62,33 @@ Dans la sidebar Streamlit:
 - Filtre anti-faux positifs dashcam: on
 - Mode nuit auto: on
 
-## Tester le module CV seul
+## Utiliser le modèle entraîné (`best.pt`)
+Après entraînement, le meilleur poids se trouve dans un dossier `runs/.../weights/best.pt`.
+
+Exemple d'évaluation sur le jeu de test:
+
 ```powershell
-.venv\Scripts\python.exe scripts/test_yolo_on_data.py --data data/test --model yolov8n --conf 0.4 --iou 0.5 --classes "car,truck,bus,person,bicycle,motorcycle,traffic light,stop sign,train" --max 10 --top 10
+.venv\Scripts\python.exe scripts/test_yolo_on_data.py --data data/images/test --model runs/detect/runs/train/expert_global_1h_quiet2/weights/best.pt --conf 0.35 --iou 0.5 --max 200
 ```
 
 ## Sortie JSON des détections
 ```powershell
-.venv\Scripts\python.exe scripts/test_yolo_on_data.py --data data/test --model yolov8n --max 50 --out outputs/detections.json
-.venv\Scripts\python.exe scripts/validate_detections.py --input outputs/detections.json --classes car,person,truck,traffic\ light
+.venv\Scripts\python.exe scripts/test_yolo_on_data.py --data data/images/test --model runs/detect/runs/train/expert_global_1h_quiet2/weights/best.pt --max 200 --out outputs/detections_expert_global.json
+.venv\Scripts\python.exe scripts/validate_detections.py --input outputs/detections_expert_global.json --classes pedestrian,cyclist,motorcycle,truck,bus,car,traffic_light,traffic_sign,rider,train
+.venv\Scripts\python.exe scripts/visualize_detections.py --detections outputs/detections_expert_global.json --out outputs/viz_100 --max 100
 ```
 
-## Fine-tuning (prochaine étape)
-Commande disponible, non utilisée dans le flux courant:
+## Entraînement global (déjà utilisé)
+Commande de référence pour relancer un entraînement global:
 
 ```powershell
-.venv\Scripts\python.exe scripts/train_yolo.py --data data.yaml --model yolov8n.pt --epochs 50 --imgsz 640 --batch 16
+.venv\Scripts\python.exe scripts/train_yolo.py --data data.yaml --model yolov8n.pt --epochs 12 --imgsz 448 --batch 16 --workers 8 --patience 4 --name expert_global_1h_quiet --device 0 --epoch-only --no-wandb
 ```
 
-## Problèmes connus (pré-fine-tuning)
-- Performance variable selon luminosité, densité de scène et angle dashcam.
-- Certains faux positifs/faux négatifs persistent sans modèle spécialisé dataset.
+## Problèmes connus
+- Performance variable selon luminosité, densité de scène et angle dashcam (surtout nuit/pluie).
+- Certaines classes restent bruyantes (ex: `traffic_sign`) selon le seuil de confiance.
+- Le temps d'entraînement peut dépasser 1h selon la taille du split global.
 
 ## Dépannage rapide
 - `ModuleNotFoundError` sur un package: réinstaller dans le venv avec `.venv\Scripts\python.exe -m pip install -r requirements.txt`.
