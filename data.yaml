@@ -1,5 +1,6 @@
-train: ../txt/train_autoroute.txt
-val: ../txt/val_autoroute.txt
+train: data/txt/train_global.txt
+val: data/txt/val_global.txt
+test: data/txt/test_global.txt
 nc: 10
 names:
   0: pedestrian

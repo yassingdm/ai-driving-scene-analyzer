@@ -77,7 +77,7 @@ Dans la sidebar Streamlit:
 Commande disponible, non utilisée dans le flux courant:
 
 ```powershell
-.venv\Scripts\python.exe scripts/train_yolo.py --data data/data.yaml --model yolov8n.pt --epochs 50 --imgsz 640 --batch 16
+.venv\Scripts\python.exe scripts/train_yolo.py --data data.yaml --model yolov8n.pt --epochs 50 --imgsz 640 --batch 16
 ```
 
 ## Problèmes connus (pré-fine-tuning)
