@@ -15,6 +15,11 @@ def run_step(command):
 
 def main():
     parser = argparse.ArgumentParser(description="Pipeline complet : Préparation + Entraînement")
+    parser.add_argument("--device", default="0", help="Device id or cpu")
+    parser.add_argument("--workers", type=int, default=8, help="Data loader workers")
+    parser.add_argument("--patience", type=int, default=20, help="Early stopping patience")
+    parser.add_argument("--project", default="runs/train", help="Output project dir")
+    parser.add_argument("--resume", action="store_true", help="Resume training")
     parser.add_argument("--data", required=True, help="Chemin vers le fichier .yaml")
     parser.add_argument("--model", default="yolov8n.pt", help="Modèle de base")
     parser.add_argument("--epochs", type=int, default=50, help="Nombre d'époques")
@@ -47,7 +52,7 @@ def main():
 
     
     cmd_train = (f"python3 {path}/scripts/train_yolo.py --data {args.data} --model {args.model} "
-                 f"--epochs {args.epochs} --imgsz {args.imgsz} --batch {args.batch} --name {run_name}")
+                 f"--epochs {args.epochs} --imgsz {args.imgsz} --batch {args.batch} --name {run_name} --workers {args.workers} --device {args.device} --patience {args.patience} --project {args.project}")
     print("Lancement de l'entraînement YOLO")
     run_step(cmd_train)
 
