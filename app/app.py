@@ -17,7 +17,7 @@ from scripts.visualize_detections import color_for_name
 
 EXPERTS_YOLO = {
     "classique ": "yolov8n",
-    "Expert autoroute ": "yolov8n",
+    "Expert autoroute ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:autoroutev1.pt",
     "Expert nuit ": "yolov8n",
     "Expert parking ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:parkingv1.pt",
     "Expert piétons ": "yolov8n",
