@@ -219,6 +219,8 @@ __marimo__/
 /models/
 # Visualisations locales
 outputs/vis/
+outputs/
+outputs/viz_100
 
 
 *..venv*
