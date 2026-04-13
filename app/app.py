@@ -16,13 +16,14 @@ from LLM.agent import analyze_scene
 from scripts.visualize_detections import color_for_name
 
 EXPERTS_YOLO = {
-    "classique ": "yolov8n",
+    "untrained ": "yolov8n.pt",
+    "expert general ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:general.pt",
     "Expert autoroute ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:autoroutev1.pt",
     "Expert nuit ": "yolov8n",
     "Expert parking ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:parkingv1.pt",
     "Expert piétons ": "yolov8n",
-    "Expert pluie_brouillard ": "yolov8n",
-    "Expert urbain ": "yolov8n",
+    "Expert pluie_brouillard ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:pluie_brouillard.pt",
+    "Expert urbain ": "hf://bastien-adiveze/ai-driving-scene-analyzer-models:urbainv2.pt",
     "Expert scolaire ": "yolov8n",
 
 }
