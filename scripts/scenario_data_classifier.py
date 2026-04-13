@@ -15,7 +15,7 @@ def build_tasks():
 
     for split in ("train", "val", "test"):
         labels_dir = labels_root / split
-        if labels_dir.exists() and labels_dir.is_dir():
+        if labels_dir.exists() and labels_dir.is_dir() and any(labels_dir.glob("*.json")):
             tasks.append(
                 {
                     "nom": split.upper(),
@@ -196,6 +196,8 @@ def traiter_fichier_json(config):
             scenarios['scolaire'].append(img_path)
         scenarios['all'].append(img_path)
 
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
     for nom_scenario, liste_chemins in scenarios.items():
         fichier_txt = os.path.join(OUTPUT_DIR, f"{file_prefix}{nom_scenario}.txt")
         _write_lines(fichier_txt, liste_chemins)

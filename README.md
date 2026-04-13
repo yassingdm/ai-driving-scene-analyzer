@@ -7,7 +7,7 @@ Application de démonstration qui combine:
 
 ## Statut du projet
 - Etat actuel: pipeline fonctionnel avec modèle global entraîné.
-- Détection: modèle custom disponible (`best.pt`) + modèle YOLO de base en fallback.
+- Détection: plusieurs modeles disponibles en telechargement depuis huggingFace(automatique) + modèle YOLO de base en fallback.
 - Entraînement BDD100K: réalisé (train/val globaux générés).
 
 ## Pipeline
@@ -55,6 +55,7 @@ Ne pas utiliser `streamlit run app/app.py` sans préciser l'interpréteur, sinon
 
 ## Paramètres CV recommandés (post-entraînement)
 Dans la sidebar Streamlit:
+- Choix du modèle
 - Seuil confiance: 0.40
 - Seuil IoU: 0.50
 - Sortie brute YOLO: off
