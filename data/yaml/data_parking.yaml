@@ -1,5 +1,5 @@
-train: /home/bastos/cours/projIA/ai-driving-scene-analyzer/data/txt/train_parking.txt
-val: /home/bastos/cours/projIA/ai-driving-scene-analyzer/data/txt/val_parking.txt
+train: ../txt/train_parking.txt
+val: ../txt/val_parking.txt
 nc: 10
 names:
   0: pedestrian

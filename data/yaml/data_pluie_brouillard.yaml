@@ -1,5 +1,5 @@
-train: /home/bastos/cours/projIA/ai-driving-scene-analyzer/data/txt/train_pluie_brouillard.txt
-val: /home/bastos/cours/projIA/ai-driving-scene-analyzer/data/txt/val_pluie_brouillard.txt
+train: ../txt/train_pluie_brouillard.txt
+val: ../txt/val_pluie_brouillard.txt
 nc: 10
 names:
   0: pedestrian
