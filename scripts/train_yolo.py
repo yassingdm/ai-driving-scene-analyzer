@@ -8,9 +8,10 @@ import logging
 from pathlib import Path
 
 import torch
-from ultralytics import YOLO
+from ultralytics import YOLO,settings
 import ultralytics.utils as ultralytics_utils
-
+project_root = os.getenv("PROJECT_PATH", "/home/bastos/cours/projIA/ai-driving-scene-analyzer")
+data_root = os.path.join(project_root, "data")
 
 def _allow_ultralytics_weights() -> None:
     try:
@@ -101,6 +102,7 @@ def main() -> int:
 
     device = _resolve_device(args.device)
     model = YOLO(args.model)
+    settings.update({'datasets_dir': data_root})
     model.train(
         data=str(data_path),
         epochs=args.epochs,

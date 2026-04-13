@@ -209,7 +209,7 @@ marimo/_lsp/
 __marimo__/
 
 # Données et datasets (garder les .yaml)
-/data/images/*
+/data/images/*/*.jpg
 /data/labels/*
 /data/txt/*
 /data/*.json
