@@ -157,15 +157,44 @@ def traiter_fichier_json(config):
             return
         json_files = [Path(json_path)]
 
-    scenarios = _empty_scenarios()
+    scenarios = {
+        'urbain': [], 'nuit': [], 'pluie_brouillard': [],
+        'autoroute': [], 'parking': [], 'pieton': [], 'scolaire': [], 'all': []
+    }
 
     for json_file in json_files:
         data = _read_items_from_json_file(json_file)
 
-        for item in data:
-            _append_scenario_paths(scenarios, item, img_prefix)
+    for item in data:
+        img_name = item.get('name')
+        if not img_name:
+            continue
+            
+        img_path = os.path.join(img_prefix, img_name).replace('\\', '/')
+        
+        attrs = item.get('attributes', {})
+        scene = attrs.get('scene', '')
+        timeofday = attrs.get('timeofday', '')
+        weather = attrs.get('weather', '')
+        
+        labels = item.get('labels')or []
+        objets_presents = [label.get('category') for label in labels if 'category' in label]
 
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+        if scene == 'city street':
+            scenarios['urbain'].append(img_path)
+        if timeofday == 'night':
+            scenarios['nuit'].append(img_path)
+        if weather in ['rainy', 'foggy']:
+            scenarios['pluie_brouillard'].append(img_path)
+        if scene == 'highway':
+            scenarios['autoroute'].append(img_path)
+        if scene == 'parking lot':
+            scenarios['parking'].append(img_path)
+        if 'pedestrian' in objets_presents:
+            scenarios['pieton'].append(img_path)
+        if scene == 'residential' and 'traffic sign' in objets_presents:
+            scenarios['scolaire'].append(img_path)
+        scenarios['all'].append(img_path)
 
     for nom_scenario, liste_chemins in scenarios.items():
         fichier_txt = os.path.join(OUTPUT_DIR, f"{file_prefix}{nom_scenario}.txt")

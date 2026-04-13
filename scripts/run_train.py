@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--epochs", type=int, default=50, help="Nombre d'époques")
     parser.add_argument("--imgsz", type=int, default=640, help="Taille d'image")
     parser.add_argument("--batch", type=int, default=16, help="Batch size")
+    parser.add_argument("--save_period", type=int, default=20, help="Période de sauvegarde ")
     parser.add_argument("--name", help="Nom de l'entraînement (par défaut extrait du yaml)")
     
     args = parser.parse_args()
@@ -52,7 +53,7 @@ def main():
 
     
     cmd_train = (f"python3 {path}/scripts/train_yolo.py --data {args.data} --model {args.model} "
-                 f"--epochs {args.epochs} --imgsz {args.imgsz} --batch {args.batch} --name {run_name} --workers {args.workers} --device {args.device} --patience {args.patience} --project {args.project}")
+                 f"--epochs {args.epochs} --imgsz {args.imgsz} --batch {args.batch} --name {run_name} --workers {args.workers} --device {args.device} --patience {args.patience} --project {args.project} --save_period {args.save_period}")
     print("Lancement de l'entraînement YOLO")
     run_step(cmd_train)
 
