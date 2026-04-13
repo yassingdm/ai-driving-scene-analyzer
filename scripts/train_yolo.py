@@ -42,6 +42,7 @@ def main() -> int:
     parser.add_argument("--workers", type=int, default=8, help="Data loader workers")
     parser.add_argument("--patience", type=int, default=20, help="Early stopping patience")
     parser.add_argument("--project", default="runs/train", help="Output project dir")
+    parser.add_argument("--save_period", type=int, default=20, help="Période de sauvegarde ")
     parser.add_argument("--name", default="bdd100k", help="Run name")
     parser.add_argument("--resume", action="store_true", help="Resume training")
     args = parser.parse_args()
@@ -62,6 +63,7 @@ def main() -> int:
         project=args.project,
         name=args.name,
         resume=args.resume,
+        save_period=args.save_period,
     )
 
     return 0

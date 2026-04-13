@@ -36,7 +36,7 @@ def traiter_fichier_json(config):
 
     scenarios = {
         'urbain': [], 'nuit': [], 'pluie_brouillard': [],
-        'autoroute': [], 'parking': [], 'pieton': [], 'scolaire': []
+        'autoroute': [], 'parking': [], 'pieton': [], 'scolaire': [], 'all': []
     }
 
     with open(json_path, 'r', encoding='utf-8') as f:
@@ -71,6 +71,7 @@ def traiter_fichier_json(config):
             scenarios['pieton'].append(img_path)
         if scene == 'residential' and 'traffic sign' in objets_presents:
             scenarios['scolaire'].append(img_path)
+        scenarios['all'].append(img_path)
 
     for nom_scenario, liste_chemins in scenarios.items():
         fichier_txt = os.path.join(OUTPUT_DIR, f"{file_prefix}{nom_scenario}.txt")
