@@ -222,6 +222,6 @@ outputs/vis/
 outputs/
 outputs/viz_100
 yolo26n.pt
-
+data
 *..venv*
 *.swp
